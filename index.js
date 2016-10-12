@@ -7,11 +7,13 @@ const request = require("request");
 
 const app = electron.app;
 let downloadFolder = app.getPath("downloads");
+let lastWindowCreated;
 
 let queue = [];
 
 function _registerListener(win, opts = {}, cb = () => {}) {
 
+    lastWindowCreated = win;
     downloadFolder = opts.downloadFolder || downloadFolder;
 
     const listener = (e, item, webContents) => {
@@ -64,7 +66,7 @@ var register = (opts = {}) => {
 };
 
 var download = (options, callback) => {
-    let win = BrowserWindow.getFocusedWindow();
+    let win = BrowserWindow.getFocusedWindow() || lastWindowCreated;
     options = Object.assign({}, {
         path: ""
     }, options);
