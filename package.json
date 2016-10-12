@@ -1,0 +1,31 @@
+{
+  "name": "electron-download-manager",
+  "version": "1.0.0",
+  "description": "Manage downloadItems from Electron's BrowserWindows without user interaction, allowing single file download and bulk downloading",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielnieto/electron-download-manager.git"
+  },
+  "keywords": [
+    "electron",
+    "download",
+    "downloaditem",
+    "manager",
+    "bulk",
+    "multi"
+  ],
+  "author": "Daniel Nieto <danielnieto89@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/danielnieto/electron-download-manager/issues"
+  },
+  "homepage": "https://github.com/danielnieto/electron-download-manager#readme",
+  "dependencies": {
+    "electron": "^1.4.3",
+    "unused-filename": "^0.1.0"
+  }
+}
