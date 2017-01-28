@@ -24,7 +24,17 @@ function _registerListener(win, opts = {}, cb = () => {}) {
             path.join(downloadFolder, path.join(queueItem.path, item.getFilename()))
         );
 
+        const totalBytes = item.getTotalBytes();
+
         item.setSavePath(filePath);
+
+        item.on('updated', () => {
+            const progress = item.getReceivedBytes() * 100 / totalBytes;
+
+            if (typeof queueItem.onProgress === 'function') {
+                queueItem.onProgress(progress);
+            }
+        });
 
         item.on('done', (e, state) => {
 
@@ -77,7 +87,8 @@ var download = (options, callback) => {
         queue.push({
             url: response.request.uri.href,
             path: options.path.toString(),
-            callback: callback
+            callback: callback,
+            onProgress: options.onProgress
         });
 
         win.webContents.downloadURL(options.url);
