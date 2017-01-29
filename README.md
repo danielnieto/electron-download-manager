@@ -169,9 +169,19 @@ Default: `""`
 
 Set a folder where this downloadItems will be downloaded to. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
+####onProgress(progress)
+Type: `function`<br>
+
+A function to be called whenever the file being downloaded progresses, this function will be constantly called with the updated value. 
+
+`progress` float. Represents the download progress percentage. example: `4.637489318847656`
+
+>This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
+
+
 ###callback(error, url)
 
-Callback to be called when the download has reached a "done" state, which could mean two things or it was successful, or it failed.
+Callback to be called when the download has reached a "done" state, which could mean two things either it was successful, or it failed.
 
 if the download was successful the callback's error will be `null`
 
