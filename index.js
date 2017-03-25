@@ -37,7 +37,7 @@ function _registerListener(win, opts = {}, cb = () => {}) {
             const progress = item.getReceivedBytes() * 100 / totalBytes;
 
             if (typeof queueItem.onProgress === 'function') {
-                queueItem.onProgress(progress);
+                queueItem.onProgress(progress, item);
             }
         });
 
