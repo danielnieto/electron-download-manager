@@ -28,6 +28,11 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
         item.setSavePath(filePath);
 
+        // Resuming an interupted download
+        if (item.getState() === 'interrupted') {
+            item.resume();
+        }
+
         item.on('updated', () => {
             const progress = item.getReceivedBytes() * 100 / totalBytes;
 
@@ -91,7 +96,40 @@ var download = (options, callback) => {
             onProgress: options.onProgress
         });
 
-        win.webContents.downloadURL(options.url);
+        const filename = path.basename(response.request.uri.href);
+
+        const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
+
+        if (fs.existsSync(filePath)) {
+            const stats = fs.statSync(filePath);
+
+            const fileOffset = stats.size;
+
+            const serverFileSize = parseInt(response.headers["content-length"]);
+
+            console.log(filename + ' exists, verifying file size: (' + fileOffset + ' / ' + serverFileSize + " downloaded)");
+
+            // Check if size on disk is lower than server
+            if (fileOffset < serverFileSize) {
+                console.log('File needs re-downloaded as it was not completed');
+
+                options = {
+                    path: filePath,
+                    urlChain: [response.request.uri.href],
+                    offset: parseInt(fileOffset),
+                    length: serverFileSize,
+                    lastModified: response.headers["last-modified"]
+                };
+
+                win.webContents.session.createInterruptedDownload(options);
+            } else {
+                console.log(filename + ' verified, no download needed');
+            }
+
+        } else {
+            console.log(filename + ' does not exist, download it now');
+            win.webContents.downloadURL(options.url);
+        }
     })
 
 }
