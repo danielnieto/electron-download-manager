@@ -20,7 +20,7 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
         let queueItem = _popQueueItem(item.getURL());
 
-        const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
+        const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
 
         const totalBytes = item.getTotalBytes();
 
