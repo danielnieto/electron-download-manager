@@ -80,6 +80,8 @@ var register = (opts = {}) => {
     });
 };
 
+var fs = require('fs');
+
 var download = (options, callback) => {
     let win = BrowserWindow.getFocusedWindow() || lastWindowCreated;
     options = Object.assign({}, {
