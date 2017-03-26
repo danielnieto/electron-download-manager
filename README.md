@@ -42,7 +42,7 @@ app.on("ready", () => {
 
 After registering you must wait until at least 1 window is created to call DownloadManager.download function
 
-####Single file download from the Main Process
+#### Single file download from the Main Process
 
 ```js
 
@@ -77,7 +77,7 @@ app.on("ready", ()=>{
 
 This example downloads *http://i.imgur.com/CuVQGg3.jpg* file to *user-downloads-folder/my-app/CuVQGg3.jpg*
 
-####Bulk file download from the Main Process
+#### Bulk file download from the Main Process
 
 ```js
 
@@ -156,20 +156,20 @@ By default, this "root" folder will be user's OS downloads folder
 
 ### DownloadManager.download(options, callback(error, url))
 
-###options
+### options
 
-####url
+#### url
 Type: `string`
 
 The url of the file to be downloaded
 
-####path
+#### path
 Type: `string`<br>
 Default: `""`
 
 Set a folder where this downloadItems will be downloaded to. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
-####onProgress(progress)
+#### onProgress(progress)
 Type: `function`<br>
 
 A function to be called whenever the file being downloaded progresses, this function will be constantly called with the updated value. 
@@ -179,7 +179,7 @@ A function to be called whenever the file being downloaded progresses, this func
 >This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
 
 
-###callback(error, url)
+### callback(error, url)
 
 Callback to be called when the download has reached a "done" state, which could mean two things either it was successful, or it failed.
 
@@ -189,20 +189,20 @@ if the download was successful the callback's error will be `null`
 
 ### DownloadManager.bulkDownload(options, callback(error, finished, failed))
 
-###options
+### options
 
-####urls
+#### urls
 Type: `array`
 
 Array of `url` strings of the files to be downloaded
 
-####path
+#### path
 Type: `string`<br>
 Default: `""`
 
 Set a path to save all the bulk downloaded files. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
-###callback(error, finished, failed)
+### callback(error, finished, failed)
 Callback to be called when all downloadItems in this bulk have been completed
 
 `error` will be `null` if everything was successful <br>
