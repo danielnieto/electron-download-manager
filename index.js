@@ -124,6 +124,10 @@ var download = (options, callback) => {
                 win.webContents.session.createInterruptedDownload(options);
             } else {
                 console.log(filename + ' verified, no download needed');
+
+                let finishedDownloadCallback = callback || function() {};
+
+                finishedDownloadCallback(null, response.request.uri.href);
             }
 
         } else {

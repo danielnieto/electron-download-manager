@@ -154,6 +154,10 @@ Set a folder where all downloadItems will be downloaded to. It will also be the 
 By default, this "root" folder will be user's OS downloads folder
 ([read about this](http://electron.atom.io/docs/api/app/#appgetpathname))
 
+If the file already exists in the location it will check the file's size against the size on the server, if it is lower than the server it will attempt to resume downloading the file. This is good for downloading large files. E.G Downloading a 200MB file and only 100MB downloaded (app closed/crashed) it will resume the download from where it left off automatically.
+
+If the filesize on the disk is the same as the server it will not download and return a successful callback.
+
 ### DownloadManager.download(options, callback(error, url))
 
 ###options
