@@ -2,7 +2,6 @@
 const path = require('path');
 const electron = require('electron');
 const { BrowserWindow } = electron;
-const unusedFilename = require('unused-filename');
 const request = require("request");
 
 const app = electron.app;
