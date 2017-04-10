@@ -1,6 +1,6 @@
 {
   "name": "electron-download-manager",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Manage downloadItems from Electron's BrowserWindows without user interaction, allowing single file download and bulk downloading",
   "main": "index.js",
   "scripts": {
