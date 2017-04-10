@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/danielnieto/electron-download-manager#readme",
   "dependencies": {
-    "electron": "^1.4.3",
+    "electron": ">=1.4.12",
     "unused-filename": "^0.1.0"
   }
 }
