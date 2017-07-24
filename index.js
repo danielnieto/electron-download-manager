@@ -60,7 +60,7 @@ function _registerListener(win, opts = {}, cb = () => {}) {
                 //     webContents.session.removeListener('will-download', listener);
                 // }
 
-                finishedDownloadCallback(null, item.getURL());
+                finishedDownloadCallback(null, item);
 
             }
 
