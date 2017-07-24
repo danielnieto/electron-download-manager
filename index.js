@@ -17,7 +17,7 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
     const listener = (e, item, webContents) => {
 
-        let queueItem = _popQueueItem(item.getURL());
+        let queueItem = _popQueueItem(item.getFilename());
 
         const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
 
@@ -87,15 +87,16 @@ var download = (options, callback) => {
 
     request(options.url).on("response", function(response) {
         response.request.abort();
+        
+        const filename = path.basename(response.request.uri.pathname);
 
         queue.push({
             url: response.request.uri.href,
+            filename: filename,
             path: options.path.toString(),
             callback: callback,
             onProgress: options.onProgress
         });
-
-        const filename = path.basename(response.request.uri.pathname);
 
         const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
 
@@ -174,8 +175,8 @@ var bulkDownload = (options, callback) => {
     });
 }
 
-var _popQueueItem = (url) => {
-    let queueItem = queue.find(item => item.url === url);
+var _popQueueItem = (filename) => {
+    let queueItem = queue.find(item => item.filename === filename);
     queue.splice(queue.indexOf(queueItem), 1);
     return queueItem;
 }
