@@ -183,13 +183,13 @@ A function to be called whenever the file being downloaded progresses, this func
 >This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
 
 
-### callback(error, url)
+### callback(error, item)
 
 Callback to be called when the download has reached a "done" state, which could mean two things either it was successful, or it failed.
 
 if the download was successful the callback's error will be `null`
 
-`url` returns the url of the downloaded file
+`item` returns the item 
 
 ### DownloadManager.bulkDownload(options, callback(error, finished, failed))
 
