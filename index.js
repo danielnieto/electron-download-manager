@@ -88,7 +88,7 @@ var download = (options, callback) => {
     request(options.url).on("response", function(response) {
         response.request.abort();
         
-        const filename = encodeURI(path.basename(response.request.uri.pathname));
+        const filename = decodeURI(path.basename(response.request.uri.pathname));
 
         queue.push({
             url: response.request.uri.href,
