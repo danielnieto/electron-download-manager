@@ -18,53 +18,56 @@ function _registerListener(win, opts = {}, cb = () => {}) {
     const listener = (e, item, webContents) => {
 
         let queueItem = _popQueueItem(item.getFilename());
+        
+        if (queueItem) {
 
-        const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
+            const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
 
-        const totalBytes = item.getTotalBytes();
+            const totalBytes = item.getTotalBytes();
 
-        item.setSavePath(filePath);
+            item.setSavePath(filePath);
 
-        // Resuming an interupted download
-        if (item.getState() === 'interrupted') {
-            item.resume();
-        }
-
-        item.on('updated', () => {
-            const progress = item.getReceivedBytes() * 100 / totalBytes;
-
-            if (typeof queueItem.onProgress === 'function') {
-                queueItem.onProgress(progress, item);
-            }
-        });
-
-        item.on('done', (e, state) => {
-
-            let finishedDownloadCallback = queueItem.callback || function() {};
-
-            if (!win.isDestroyed()) {
-                win.setProgressBar(-1);
+            // Resuming an interupted download
+            if (item.getState() === 'interrupted') {
+                item.resume();
             }
 
-            if (state === 'interrupted') {
-                const message = `The download of ${item.getFilename()} was interrupted`;
+            item.on('updated', () => {
+                const progress = item.getReceivedBytes() * 100 / totalBytes;
 
-                finishedDownloadCallback(new Error(message), item.getURL())
-
-            } else if (state === 'completed') {
-                if (process.platform === 'darwin') {
-                    app.dock.downloadFinished(filePath);
+                if (typeof queueItem.onProgress === 'function') {
+                    queueItem.onProgress(progress, item);
                 }
-                // TODO: remove this listener, and/or the listener that attach this listener to newly created windows
-                // if (opts.unregisterWhenDone) {
-                //     webContents.session.removeListener('will-download', listener);
-                // }
+            });
 
-                finishedDownloadCallback(null, item.getURL());
+            item.on('done', (e, state) => {
 
-            }
+                let finishedDownloadCallback = queueItem.callback || function() {};
 
-        });
+                if (!win.isDestroyed()) {
+                    win.setProgressBar(-1);
+                }
+
+                if (state === 'interrupted') {
+                    const message = `The download of ${item.getFilename()} was interrupted`;
+
+                    finishedDownloadCallback(new Error(message), item.getURL())
+
+                } else if (state === 'completed') {
+                    if (process.platform === 'darwin') {
+                        app.dock.downloadFinished(filePath);
+                    }
+                    // TODO: remove this listener, and/or the listener that attach this listener to newly created windows
+                    // if (opts.unregisterWhenDone) {
+                    //     webContents.session.removeListener('will-download', listener);
+                    // }
+
+                    finishedDownloadCallback(null, item.getURL());
+
+                }
+
+            });
+        }
     };
 
     win.webContents.session.on('will-download', listener);
