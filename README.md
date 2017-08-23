@@ -158,7 +158,7 @@ If the file already exists in the location it will check the file's size against
 
 If the filesize on the disk is the same as the server it will not download and return a successful callback.
 
-### DownloadManager.download(options, callback(error, url))
+### DownloadManager.download(options, callback(error, {url, filePath))
 
 ### options
 
@@ -183,13 +183,14 @@ A function to be called whenever the file being downloaded progresses, this func
 >This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
 
 
-### callback(error, url)
+### callback(error, {url, filePath})
 
 Callback to be called when the download has reached a "done" state, which could mean two things either it was successful, or it failed.
 
 if the download was successful the callback's error will be `null`
 
 `url` returns the url of the downloaded file
+`filePath` location of where the file is saved
 
 ### DownloadManager.bulkDownload(options, callback(error, finished, failed))
 

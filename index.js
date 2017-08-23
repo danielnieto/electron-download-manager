@@ -60,7 +60,7 @@ function _registerListener(win, opts = {}, cb = () => {}) {
                 //     webContents.session.removeListener('will-download', listener);
                 // }
 
-                finishedDownloadCallback(null, item.getURL());
+                finishedDownloadCallback(null, { url: item.getURL(), filePath });
 
             }
 
@@ -126,7 +126,7 @@ var download = (options, callback) => {
 
                 let finishedDownloadCallback = callback || function() {};
 
-                finishedDownloadCallback(null, response.request.uri.href);
+                finishedDownloadCallback(null, { url: response.request.uri.href, filePath });
             }
 
         } else {
