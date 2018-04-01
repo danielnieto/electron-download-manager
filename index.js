@@ -92,9 +92,9 @@ var download = (options, callback) => {
         response.request.abort();
 
         const filename = decodeURIComponent(path.basename(response.request.uri.pathname));
-
+        const url = decodeURIComponent(response.request.uri.href);
         queue.push({
-            url: response.request.uri.href,
+            url: url,
             filename: filename,
             path: options.path.toString(),
             callback: callback,
@@ -130,7 +130,7 @@ var download = (options, callback) => {
 
                 let finishedDownloadCallback = callback || function() {};
 
-                finishedDownloadCallback(null, { url: response.request.uri.href, filePath });
+                finishedDownloadCallback(null, { url: url, filePath });
             }
 
         } else {
