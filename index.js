@@ -101,8 +101,6 @@ var download = (options, callback) => {
             onProgress: options.onProgress
         });
 
-        const filename = path.basename(response.request.uri.href);
-
         const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
 
         if (fs.existsSync(filePath)) {
