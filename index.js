@@ -17,7 +17,7 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
     const listener = (e, item, webContents) => {
 
-        let queueItem = _popQueueItem(item.getFilename());
+        let queueItem = _popQueueItem(item.getURL());
 
         if (queueItem) {
 
@@ -178,8 +178,8 @@ var bulkDownload = (options, callback) => {
     });
 }
 
-var _popQueueItem = (filename) => {
-    let queueItem = queue.find(item => item.filename === filename);
+var _popQueueItem = (url) => {
+    let queueItem = queue.find(item => item.url === url);
     queue.splice(queue.indexOf(queueItem), 1);
     return queueItem;
 }
