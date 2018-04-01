@@ -17,54 +17,57 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
     const listener = (e, item, webContents) => {
 
-        let queueItem = _popQueueItem(item.getURL());
+        let queueItem = _popQueueItem(item.getFilename());
 
-        const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
+        if (queueItem) {
 
-        const totalBytes = item.getTotalBytes();
+            const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
 
-        item.setSavePath(filePath);
+            const totalBytes = item.getTotalBytes();
 
-        // Resuming an interupted download
-        if (item.getState() === 'interrupted') {
-            item.resume();
-        }
+            item.setSavePath(filePath);
 
-        item.on('updated', () => {
-            const progress = item.getReceivedBytes() * 100 / totalBytes;
-
-            if (typeof queueItem.onProgress === 'function') {
-                queueItem.onProgress(progress, item);
-            }
-        });
-
-        item.on('done', (e, state) => {
-
-            let finishedDownloadCallback = queueItem.callback || function() {};
-
-            if (!win.isDestroyed()) {
-                win.setProgressBar(-1);
+            // Resuming an interupted download
+            if (item.getState() === 'interrupted') {
+                item.resume();
             }
 
-            if (state === 'interrupted') {
-                const message = `The download of ${item.getFilename()} was interrupted`;
+            item.on('updated', () => {
+                const progress = item.getReceivedBytes() * 100 / totalBytes;
 
-                finishedDownloadCallback(new Error(message), item.getURL())
-
-            } else if (state === 'completed') {
-                if (process.platform === 'darwin') {
-                    app.dock.downloadFinished(filePath);
+                if (typeof queueItem.onProgress === 'function') {
+                    queueItem.onProgress(progress, item);
                 }
-                // TODO: remove this listener, and/or the listener that attach this listener to newly created windows
-                // if (opts.unregisterWhenDone) {
-                //     webContents.session.removeListener('will-download', listener);
-                // }
+            });
 
-                finishedDownloadCallback(null, { url: item.getURL(), filePath });
+            item.on('done', (e, state) => {
 
-            }
+                let finishedDownloadCallback = queueItem.callback || function() {};
 
-        });
+                if (!win.isDestroyed()) {
+                    win.setProgressBar(-1);
+                }
+
+                if (state === 'interrupted') {
+                    const message = `The download of ${item.getFilename()} was interrupted`;
+
+                    finishedDownloadCallback(new Error(message), item.getURL())
+
+                } else if (state === 'completed') {
+                    if (process.platform === 'darwin') {
+                        app.dock.downloadFinished(filePath);
+                    }
+                    // TODO: remove this listener, and/or the listener that attach this listener to newly created windows
+                    // if (opts.unregisterWhenDone) {
+                    //     webContents.session.removeListener('will-download', listener);
+                    // }
+
+                    finishedDownloadCallback(null, { url: item.getURL(), filePath });
+
+                }
+
+            });
+        }
     };
 
     win.webContents.session.on('will-download', listener);
@@ -88,8 +91,11 @@ var download = (options, callback) => {
     request(options.url).on("response", function(response) {
         response.request.abort();
 
+        const filename = decodeURIComponent(path.basename(response.request.uri.pathname));
+
         queue.push({
             url: response.request.uri.href,
+            filename: filename,
             path: options.path.toString(),
             callback: callback,
             onProgress: options.onProgress
@@ -174,8 +180,8 @@ var bulkDownload = (options, callback) => {
     });
 }
 
-var _popQueueItem = (url) => {
-    let queueItem = queue.find(item => item.url === url);
+var _popQueueItem = (filename) => {
+    let queueItem = queue.find(item => item.filename === filename);
     queue.splice(queue.indexOf(queueItem), 1);
     return queueItem;
 }
