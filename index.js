@@ -17,11 +17,14 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
     const listener = (e, item, webContents) => {
 
-        let queueItem = _popQueueItem(item.getURL());
+        const itemUrl = decodeURIComponent(item.getURL());
+        const itemFilename = decodeURIComponent(item.getFilename());
+
+        let queueItem = _popQueueItem(itemUrl);
 
         if (queueItem) {
 
-            const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
+            const filePath = path.join(downloadFolder, path.join(queueItem.path, itemFilename));
 
             const totalBytes = item.getTotalBytes();
 
@@ -93,6 +96,7 @@ var download = (options, callback) => {
 
         const filename = decodeURIComponent(path.basename(response.request.uri.pathname));
         const url = decodeURIComponent(response.request.uri.href);
+
         queue.push({
             url: url,
             filename: filename,
