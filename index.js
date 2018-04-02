@@ -17,54 +17,60 @@ function _registerListener(win, opts = {}, cb = () => {}) {
 
     const listener = (e, item, webContents) => {
 
-        let queueItem = _popQueueItem(item.getURL());
+        const itemUrl = decodeURIComponent(item.getURL());
+        const itemFilename = decodeURIComponent(item.getFilename());
 
-        const filePath = path.join(downloadFolder, path.join(queueItem.path, item.getFilename()));
+        let queueItem = _popQueueItem(itemUrl);
 
-        const totalBytes = item.getTotalBytes();
+        if (queueItem) {
 
-        item.setSavePath(filePath);
+            const filePath = path.join(downloadFolder, path.join(queueItem.path, itemFilename));
 
-        // Resuming an interupted download
-        if (item.getState() === 'interrupted') {
-            item.resume();
-        }
+            const totalBytes = item.getTotalBytes();
 
-        item.on('updated', () => {
-            const progress = item.getReceivedBytes() * 100 / totalBytes;
+            item.setSavePath(filePath);
 
-            if (typeof queueItem.onProgress === 'function') {
-                queueItem.onProgress(progress, item);
-            }
-        });
-
-        item.on('done', (e, state) => {
-
-            let finishedDownloadCallback = queueItem.callback || function() {};
-
-            if (!win.isDestroyed()) {
-                win.setProgressBar(-1);
+            // Resuming an interupted download
+            if (item.getState() === 'interrupted') {
+                item.resume();
             }
 
-            if (state === 'interrupted') {
-                const message = `The download of ${item.getFilename()} was interrupted`;
+            item.on('updated', () => {
+                const progress = item.getReceivedBytes() * 100 / totalBytes;
 
-                finishedDownloadCallback(new Error(message), item.getURL())
-
-            } else if (state === 'completed') {
-                if (process.platform === 'darwin') {
-                    app.dock.downloadFinished(filePath);
+                if (typeof queueItem.onProgress === 'function') {
+                    queueItem.onProgress(progress, item);
                 }
-                // TODO: remove this listener, and/or the listener that attach this listener to newly created windows
-                // if (opts.unregisterWhenDone) {
-                //     webContents.session.removeListener('will-download', listener);
-                // }
+            });
 
-                finishedDownloadCallback(null, { url: item.getURL(), filePath });
+            item.on('done', (e, state) => {
 
-            }
+                let finishedDownloadCallback = queueItem.callback || function() {};
 
-        });
+                if (!win.isDestroyed()) {
+                    win.setProgressBar(-1);
+                }
+
+                if (state === 'interrupted') {
+                    const message = `The download of ${item.getFilename()} was interrupted`;
+
+                    finishedDownloadCallback(new Error(message), item.getURL())
+
+                } else if (state === 'completed') {
+                    if (process.platform === 'darwin') {
+                        app.dock.downloadFinished(filePath);
+                    }
+                    // TODO: remove this listener, and/or the listener that attach this listener to newly created windows
+                    // if (opts.unregisterWhenDone) {
+                    //     webContents.session.removeListener('will-download', listener);
+                    // }
+
+                    finishedDownloadCallback(null, { url: item.getURL(), filePath });
+
+                }
+
+            });
+        }
     };
 
     win.webContents.session.on('will-download', listener);
@@ -88,14 +94,16 @@ var download = (options, callback) => {
     request(options.url).on("response", function(response) {
         response.request.abort();
 
+        const filename = decodeURIComponent(path.basename(response.request.uri.pathname));
+        const url = decodeURIComponent(response.request.uri.href);
+
         queue.push({
-            url: response.request.uri.href,
+            url: url,
+            filename: filename,
             path: options.path.toString(),
             callback: callback,
             onProgress: options.onProgress
         });
-
-        const filename = path.basename(response.request.uri.href);
 
         const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
 
@@ -126,7 +134,7 @@ var download = (options, callback) => {
 
                 let finishedDownloadCallback = callback || function() {};
 
-                finishedDownloadCallback(null, { url: response.request.uri.href, filePath });
+                finishedDownloadCallback(null, { url: url, filePath });
             }
 
         } else {
