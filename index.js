@@ -61,7 +61,7 @@ function _registerListener(win, opts = {}) {
                 if (state === 'interrupted') {
                     const message = `The download of ${item.getFilename()} was interrupted`;
 
-                    finishedDownloadCallback(new Error(message), item.getURL());
+                    finishedDownloadCallback(new Error(message), { url: item.getURL(), filePath });
 
                 } else if (state === 'completed') {
                     if (process.platform === 'darwin') {
@@ -73,10 +73,7 @@ function _registerListener(win, opts = {}) {
                     //     webContents.session.removeListener('will-download', listener);
                     // }
 
-                    finishedDownloadCallback(null, {
-                        url: item.getURL(),
-                        filePath
-                    });
+                    finishedDownloadCallback(null, { url: item.getURL(), filePath });
 
                 }
 
@@ -163,12 +160,12 @@ const bulkDownload = (options, callback) => {
     let errors = [];
 
     options.urls.forEach((url) => {
-        download({ url, path: options.path }, function (error, item) {
+        download({ url, path: options.path }, function (error, itemInfo) {
 
             if (error) {
-                errors.push(item);
+                errors.push(itemInfo.url);
             } else {
-                finished.push(item);
+                finished.push(itemInfo.url);
             }
 
             let errorsCount = errors.length;
