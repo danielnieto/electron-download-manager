@@ -1,6 +1,6 @@
 # electron-download-manager
 
-> Manage downloadItems from [Electron](http://electron.atom.io)'s BrowserWindows without user interaction, allowing single file download and bulk downloading asynchronously
+> Manage downloadItems from [Electron](https://electronjs.org)'s BrowserWindows without user interaction, allowing single file download and bulk downloading asynchronously
 
 
 ## Why?
@@ -14,7 +14,7 @@
 ## Install
 
 ```
-$ npm install --save electron-download-manager
+$ npm install electron-download-manager
 ```
 
 
@@ -26,7 +26,7 @@ Register the listener (that will catch all DownloadItems)
 
 ```js
 const electron = require("electron");
-const {app, BrowserWindow} = electron;
+const { app, BrowserWindow } = electron;
 
 const DownloadManager = require("electron-download-manager");
 
@@ -35,7 +35,6 @@ DownloadManager.register();
 app.on("ready", () => {
     let mainWindow = new BrowserWindow();
 });
-
 ```
 
 ### Examples
@@ -45,7 +44,41 @@ After registering you must wait until at least 1 window is created to call Downl
 #### Single file download from the Main Process
 
 ```js
+const electron = require("electron");
+const { app, BrowserWindow } = electron;
 
+const DownloadManager = require("electron-download-manager");
+
+DownloadManager.register({
+    downloadFolder: app.getPath("downloads") + "/my-app"
+});
+
+app.on("ready", () => {
+
+    let mainWindow = new BrowserWindow();
+
+    mainWindow.loadURL(`file://${__dirname}/app/index.html`);
+
+    //Single file download
+    DownloadManager.download({
+        url: "https://i.imgur.com/H124sSq.jpg"
+    }, function (error, info) {
+        if (error) {
+            console.log(error);
+            return;
+        }
+
+        console.log("DONE: " + info.url);
+    });
+
+});
+```
+
+This example downloads *https://i.imgur.com/H124sSq.jpg* file to *user-downloads-folder/my-app/H124sSq.jpg*
+
+#### Bulk file download from the Main Process
+
+```js
 const electron = require("electron");
 const {app, BrowserWindow} = electron;
 
@@ -53,89 +86,54 @@ const DownloadManager = require("electron-download-manager");
 
 DownloadManager.register({downloadFolder: app.getPath("downloads") + "/my-app"});;
 
-app.on("ready", ()=>{
+app.on("ready", () => {
     let mainWindow = new BrowserWindow();
 
     mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 
-	//Single file download
-	DownloadManager.download({
-        url: "http://i.imgur.com/CuVQGg3.jpg"
-    }, function(error, url){
-        if(error){
-            console.log("ERROR: " + url);
+    var links = [
+        "https://i.imgur.com/xineeuw.jpg",
+        "https://i.imgur.com/RguiWa6.jpg",
+        "https://i.imgur.com/JR4Z0aD.jpg",
+        "https://i.imgur.com/ccvEJO1.jpg",
+        "https://i.imgur.com/yqZoShd.jpg"
+    ];
+
+    //Bulk file download    
+    DownloadManager.bulkDownload({
+        urls: links,
+        path: "bulk-download"
+    }, function (error, finished, errors) {
+        if (error) {
+            console.log("finished: " + finished);
+            console.log("errors: " + errors);
             return;
         }
 
-        console.log("DONE: " + url);
+        console.log("all finished");
     });
 
 });
 
 
 ```
-
-This example downloads *http://i.imgur.com/CuVQGg3.jpg* file to *user-downloads-folder/my-app/CuVQGg3.jpg*
-
-#### Bulk file download from the Main Process
-
-```js
-
-const electron = require("electron");
-const {app, BrowserWindow} = electron;
-
-const DownloadManager = require("electron-download-manager");
-
-DownloadManager.register({downloadFolder: app.getPath("downloads") + "/my-app"});;
-
-app.on("ready", ()=>{
-    let mainWindow = new BrowserWindow();
-
-    mainWindow.loadURL(`file://${__dirname}/app/index.html`);
-
-	    var links= [
-                "http://i.imgur.com/CuVQGg3.jpg",
-                "http://i.imgur.com/ba0urZs.jpg",
-                "http://i.imgur.com/69huDpg.png",
-                "http://i.imgur.com/ruDR7E6.png"
-            ];
-
-        //Bulk file download    
-        DownloadManager.bulkDownload({
-                urls: links,
-                path: "bulk-download"
-            }, function(error, finished, errors){
-                if(error){
-                    console.log("finished: " + finished);
-                    console.log("errors: " + errors);
-                    return;
-                }
-
-                console.log("all finished");
-            });
-
-});
-
-
-```
-This example downloads 4 files to *user-downloads-folder/my-app/bulk-downloads*
+This example downloads 5 files to *user-downloads-folder/my-app/bulk-downloads*
 
 #### Use from Renderer Process
 
-Once you've registered the listener on the Main process at any time you can call the download function `remote`
+Once you've registered the listener on the Main process at any time you can call the download function through electron's [`remote`](https://electronjs.org/docs/api/remote)
 
 ```js
 require("electron").remote.require("electron-download-manager").download({
-                url: "http://i.imgur.com/CuVQGg3.jpg"
-            }, function(error, url){
-                if(error){
-                    alert("ERROR: " + url);
-                    return;
-                }
+    url: "https://i.imgur.com/H124sSq.jpg"
+}, function (error, info) {
+    if (error) {
+        console.log(error);
+        return;
+    }
 
-                alert("DONE: " + url);
-
-            });
+    console.log("DONE: " + info.url);
+});
 ```
 
 ## API
@@ -156,9 +154,9 @@ By default, this "root" folder will be user's OS downloads folder
 
 If the file already exists in the location it will check the file's size against the size on the server, if it is lower than the server it will attempt to resume downloading the file. This is good for downloading large files. E.G Downloading a 200MB file and only 100MB downloaded (app closed/crashed) it will resume the download from where it left off automatically.
 
-If the filesize on the disk is the same as the server it will not download and return a successful callback.
+If the file size on the disk is the same as the server it will not download and return a successful callback.
 
-### DownloadManager.download(options, callback(error, {url, filePath))
+### DownloadManager.download(options, callback(error, {url, filePath}))
 
 ### options
 
@@ -180,17 +178,17 @@ A function to be called whenever the file being downloaded progresses, this func
 
 `progress` float. Represents the download progress percentage. example: `4.637489318847656`
 
->This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
+> This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
 
 
 ### callback(error, {url, filePath})
 
 Callback to be called when the download has reached a "done" state, which could mean two things either it was successful, or it failed.
 
-if the download was successful the callback's error will be `null`
+if the download was successful the callback's error will be `null`, otherwise it will contain the error message
 
-`url` returns the url of the downloaded file
-`filePath` location of where the file is saved
+`url` returns the url of the downloaded file<br>
+`filePath` location of where the file was saved
 
 ### DownloadManager.bulkDownload(options, callback(error, finished, failed))
 
@@ -208,7 +206,7 @@ Default: `""`
 Set a path to save all the bulk downloaded files. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
 ### callback(error, finished, failed)
-Callback to be called when all downloadItems in this bulk have been completed
+Callback to be executed when all downloadItems in this bulk process have been completed
 
 `error` will be `null` if everything was successful <br>
 `finished` is an array containing the `url` of successfully downloaded items <br>
