@@ -1,0 +1,12 @@
+{
+    "esversion": 6,
+    "node": true,
+    "browser": true,
+    "curly": true,
+    "eqeqeq": true,
+    "latedef": true, 
+    "unused": true,
+    "strict": true,
+    "undef": true,
+    "futurehostile": true
+}
