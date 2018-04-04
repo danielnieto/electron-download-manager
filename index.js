@@ -1,8 +1,7 @@
 'use strict';
 const path = require('path');
 const electron = require('electron');
-const { BrowserWindow } = electron;
-const request = require('request');
+const { BrowserWindow, net } = electron;
 const fs = require('fs');
 
 const app = electron.app;
@@ -95,11 +94,13 @@ const download = (options, callback) => {
     let win = BrowserWindow.getFocusedWindow() || lastWindowCreated;
     options = Object.assign({}, { path: '' }, options);
 
-    request(options.url).on('response', function (response) {
-        response.request.abort();
+    const request = net.request(options.url);
 
-        const filename = decodeURIComponent(path.basename(response.request.uri.pathname));
-        const url = decodeURIComponent(response.request.uri.href);
+    request.on('response', function (response) {
+        request.abort();
+
+        const filename = decodeURIComponent(path.basename(options.url));
+        const url = decodeURIComponent(options.url);
 
         queue.push({
             url: url,
@@ -148,7 +149,7 @@ const download = (options, callback) => {
             win.webContents.downloadURL(options.url);
         }
     });
-
+    request.end();
 };
 
 const bulkDownload = (options, callback) => {
