@@ -127,7 +127,7 @@ const download = (options, callback) => {
 
                 options = {
                     path: filePath,
-                    urlChain: [response.request.uri.href],
+                    urlChain: [options.url],
                     offset: parseInt(fileOffset),
                     length: serverFileSize,
                     lastModified: response.headers['last-modified']
