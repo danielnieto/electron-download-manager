@@ -92,7 +92,7 @@ const register = (opts = {}) => {
 
 const download = (options, callback) => {
     let win = BrowserWindow.getFocusedWindow() || lastWindowCreated;
-    options = Object.assign({}, { path: '' }, options);
+    options = Object.assign({}, { path: '', downloadFolder }, options);
 
     const request = net.request(options.url);
 
@@ -110,7 +110,7 @@ const download = (options, callback) => {
             onProgress: options.onProgress
         });
 
-        const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
+        const filePath = path.join(path.join(options.downloadFolder, options.path.toString()), filename);
 
         if (fs.existsSync(filePath)) {
             const stats = fs.statSync(filePath);
