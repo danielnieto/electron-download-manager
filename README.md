@@ -171,12 +171,14 @@ Default: `""`
 
 Set a folder where this downloadItems will be downloaded to. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
-#### onProgress(progress)
+#### onProgress(progress, item)
 Type: `function`<br>
 
 A function to be called whenever the file being downloaded progresses, this function will be constantly called with the updated value. 
 
 `progress` float. Represents the download progress percentage. example: `4.637489318847656`
+
+`item` instance of [DownloadItem](https://electronjs.org/docs/api/download-item#class-downloaditem) class. Useful for pausing and cancelling among other things.
 
 > This feature currently exists only for single file downloads and hasn't been implemented (yet) for bulk processing.
 
