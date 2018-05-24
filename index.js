@@ -29,8 +29,8 @@ function _registerListener(win, opts = {}) {
         let queueItem = _popQueueItem(itemUrl);
 
         if (queueItem) {
-
-            const filePath = path.join(downloadFolder, path.join(queueItem.path, itemFilename));
+            const folder = queueItem.downloadFolder || downloadFolder
+            const filePath = path.join(folder, queueItem.path, itemFilename);
 
             const totalBytes = item.getTotalBytes();
 
@@ -105,12 +105,14 @@ const download = (options, callback) => {
         queue.push({
             url: url,
             filename: filename,
+            downloadFolder: options.downloadFolder,
             path: options.path.toString(),
             callback: callback,
             onProgress: options.onProgress
         });
 
-        const filePath = path.join(path.join(downloadFolder, options.path.toString()), filename);
+        const folder = options.downloadFolder || downloadFolder
+        const filePath = path.join(folder, options.path.toString(), filename)
 
         if (fs.existsSync(filePath)) {
             const stats = fs.statSync(filePath);
