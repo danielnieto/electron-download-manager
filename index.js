@@ -174,6 +174,10 @@ const bulkDownload = (options, callback) => {
             let errorsCount = errors.length;
             let finishedCount = finished.length;
 
+            if (typeof options.onResult === 'function') {
+                options.onResult(finishedCount, errorsCount, itemInfo.url);
+            }
+
             if ((finishedCount + errorsCount) === urlsCount) {
                 if (errorsCount > 0) {
                     callback(new Error(errorsCount + ' downloads failed'), finished, errors);
