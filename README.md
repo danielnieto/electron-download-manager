@@ -207,6 +207,20 @@ Default: `""`
 
 Set a path to save all the bulk downloaded files. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
+#### onResult(finishedCount, errorsCount, itemUrl)
+Type: `function`<br>
+
+A function to be called whenever a file has been downloaded or whenever a download failed. 
+
+`finishedCount` integer. Represents the number of file successfully downloaded. example: `4`
+
+`errorsCount` integer. Represents the number of file that couldn't be downloaded. example: `5`
+
+`itemUrl` string. Represents the `url` of the item.
+
+> This feature is really different as the `onProgress` feature for single files as it doesn't take the size in the calculation.
+
+
 ### callback(error, finished, failed)
 Callback to be executed when all downloadItems in this bulk process have been completed
 
