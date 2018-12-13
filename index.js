@@ -1,7 +1,7 @@
 'use strict';
 const path = require('path');
 const electron = require('electron');
-const { BrowserWindow, net } = electron;
+const { BrowserWindow, net, session } = electron;
 const fs = require('fs');
 
 const app = electron.app;
@@ -95,6 +95,22 @@ const download = (options, callback) => {
     options = Object.assign({}, { path: '' }, options);
 
     const request = net.request(options.url);
+    
+    if (options.headers) {
+        options.headers.forEach((h) => { request.setHeader(h.name, h.value) })
+
+        // Modify the user agent for all requests to the following urls.
+        const filter = {
+            urls: [options.url]
+        }
+
+        session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+            options.headers.forEach((h) => { details.requestHeaders[h.name] =  h.value })
+            // details.requestHeaders['User-Agent'] = 'MyAgent'
+            callback({ cancel: false, requestHeaders: details.requestHeaders })
+        })
+    }
+
 
     request.on('response', function (response) {
         request.abort();
