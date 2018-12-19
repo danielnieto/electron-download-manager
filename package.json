@@ -24,7 +24,7 @@
     "url": "https://github.com/danielnieto/electron-download-manager/issues"
   },
   "homepage": "https://github.com/danielnieto/electron-download-manager#readme",
-  "dependencies": {
+  "devDependencies": {
     "electron": ">=1.4.12"
   }
 }
