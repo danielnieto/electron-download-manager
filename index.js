@@ -23,7 +23,7 @@ function _registerListener(win, opts = {}) {
 
     const listener = (e, item) => {
 
-        const itemUrl = decodeURIComponent(item.getURL());
+        const itemUrl = decodeURIComponent(item.getURLChain()[0] || item.getURL())
         const itemFilename = decodeURIComponent(item.getFilename());
 
         let queueItem = _popQueueItem(itemUrl);
