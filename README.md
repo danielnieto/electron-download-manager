@@ -171,6 +171,30 @@ Default: `""`
 
 Set a folder where this downloadItems will be downloaded to. This folder is relative to downloadFolder location set in the register function. By default it will be downloaded to root of downloadFolder which would be user download's folder.
 
+#### onLogin(authInfo, callback)
+Type: `function`<br>
+
+Emitted when an authenticating proxy is asking for user credentials.
+
+```js
+    DownloadManager.download({
+        url: "https://i.imgur.com/H124sSq.jpg",
+        onLogin: (authInfo, callback) => {
+            callback('username', 'password');
+        },
+    }, function (error, info) {
+        if (error) {
+            console.log(error);
+            return;
+        }
+
+        console.log("DONE: " + info.url);
+    });
+
+```
+
+> Please see [Class ClientRequest's 'login' event](http://electronjs.org/docs/api/client-request#event-login) for detail.
+
 #### onProgress(progress, item)
 Type: `function`<br>
 

@@ -111,6 +111,9 @@ const download = (options, callback) => {
         })
     }
 
+    if (typeof options.onLogin === 'function') {
+        request.on('login', options.onLogin)
+    }
 
     request.on('response', function (response) {
         request.abort();
