@@ -200,7 +200,20 @@ Type: `function`<br>
 
 A function to be called whenever the file being downloaded progresses, this function will be constantly called with the updated value. 
 
-`progress` float. Represents the download progress percentage. example: `4.637489318847656`
+`progress` an object with various metrics for the downloading file
+`
+{
+    downloaded          // downloaded amount in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    downloadedBytes     // same as previous only in bytes for calculation if required (eg. 4061073)
+    progress            // float progress of downloaing file (0 to 100)
+    remaining           // remaining amount of file download in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] (eg. 28.36 MB)
+    remainingBytes      // same as previous only in bytes for calculation if required (eg. 28360919)
+    speed               // download speed (eg. 311.3 KB/sec)
+    speedBytes          // same as previous only in bytes for calculation if required (eg. 311296)
+    total               // file size in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] (eg. 32.42 MB)
+    totalBytes          // same as previous only in bytes for calculation if required (eg. 32421992)
+}
+`
 
 `item` instance of [DownloadItem](https://electronjs.org/docs/api/download-item#class-downloaditem) class. Useful for pausing and cancelling among other things.
 
