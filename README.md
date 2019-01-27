@@ -201,7 +201,7 @@ Type: `function`<br>
 A function to be called whenever the file being downloaded progresses, this function will be constantly called with the updated value. 
 
 `progress` an object with various metrics for the downloading file
-`
+```
 {
     downloaded          // downloaded amount in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
     downloadedBytes     // same as previous only in bytes for calculation if required (eg. 4061073)
@@ -213,7 +213,7 @@ A function to be called whenever the file being downloaded progresses, this func
     total               // file size in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] (eg. 32.42 MB)
     totalBytes          // same as previous only in bytes for calculation if required (eg. 32421992)
     }
-`
+```
 
 `item` instance of [DownloadItem](https://electronjs.org/docs/api/download-item#class-downloaditem) class. Useful for pausing and cancelling among other things.
 
