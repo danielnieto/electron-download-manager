@@ -182,7 +182,7 @@ const bulkDownload = (options, callback) => {
     let errors = [];
 
     options.urls.forEach((url) => {
-        download({ url, path: options.path }, function (error, itemInfo) {
+        download({ url, path: options.path, onProgress: options.onProgress }, function (error, itemInfo) {
 
             if (error) {
                 errors.push(itemInfo.url);
