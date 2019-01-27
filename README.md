@@ -212,7 +212,7 @@ A function to be called whenever the file being downloaded progresses, this func
     speedBytes          // same as previous only in bytes for calculation if required (eg. 311296)
     total               // file size in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] (eg. 32.42 MB)
     totalBytes          // same as previous only in bytes for calculation if required (eg. 32421992)
-}
+    }
 `
 
 `item` instance of [DownloadItem](https://electronjs.org/docs/api/download-item#class-downloaditem) class. Useful for pausing and cancelling among other things.
