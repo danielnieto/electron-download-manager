@@ -16,6 +16,25 @@ const _popQueueItem = (url) => {
     return queueItem;
 };
 
+ const _bytesToSize = (bytes,decimals) => {
+    if(bytes == 0) return '0 Bytes';
+    var k = 1000,
+        dm = decimals || 2,
+        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+        i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+
+ const _convertTime = (input, separator) => {
+    var pad = function(input) {return input < 10 ? "0" + input : input;};
+    return [
+        pad(Math.floor(input / 3600)),
+        pad(Math.floor(input % 3600 / 60)),
+        pad(Math.floor(input % 60)),
+    ].join(typeof separator !== 'undefined' ?  separator : ':' );
+}
+
 function _registerListener(win, opts = {}) {
 
     lastWindowCreated = win;
@@ -27,12 +46,16 @@ function _registerListener(win, opts = {}) {
         const itemFilename = decodeURIComponent(item.getFilename());
 
         let queueItem = _popQueueItem(itemUrl);
+        let ReceivedBytesArr = [];
 
         if (queueItem) {
             const folder = queueItem.downloadFolder || downloadFolder
             const filePath = path.join(folder, queueItem.path, itemFilename);
 
             const totalBytes = item.getTotalBytes();
+            let speedValue = 0;
+            let receivedBytes;
+            let PreviousReceivedBytes;
 
             item.setSavePath(filePath);
 
@@ -42,7 +65,25 @@ function _registerListener(win, opts = {}) {
             }
 
             item.on('updated', () => {
-                const progress = item.getReceivedBytes() * 100 / totalBytes;
+
+                receivedBytes = item.getReceivedBytes();
+                ReceivedBytesArr.push(receivedBytes);
+                if (ReceivedBytesArr.length >= 2) {
+                    PreviousReceivedBytes = ReceivedBytesArr.shift();
+                    speedValue = Math.max(PreviousReceivedBytes, ReceivedBytesArr[0]) - Math.min(PreviousReceivedBytes, ReceivedBytesArr[0]);
+                }
+                const progress = {
+                    progress: receivedBytes * 100 / totalBytes,
+                    speedBytes: speedValue,
+                    speed: _bytesToSize(speedValue) + '/sec',
+                    remainingBytes: totalBytes - receivedBytes,
+                    remaining: _bytesToSize(totalBytes - receivedBytes),
+                    totalBytes: totalBytes,
+                    total: _bytesToSize(totalBytes),
+                    downloadedBytes: receivedBytes,
+                    downloaded: _bytesToSize(receivedBytes),
+                }
+
 
                 if (typeof queueItem.onProgress === 'function') {
                     queueItem.onProgress(progress, item);
@@ -182,7 +223,7 @@ const bulkDownload = (options, callback) => {
     let errors = [];
 
     options.urls.forEach((url) => {
-        download({ url, path: options.path }, function (error, itemInfo) {
+        download({ url, path: options.path, onProgress: options.onProgress }, function (error, itemInfo) {
 
             if (error) {
                 errors.push(itemInfo.url);
