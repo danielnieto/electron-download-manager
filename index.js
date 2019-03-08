@@ -172,7 +172,7 @@ const download = (options, callback) => {
         });
 
         const folder = options.downloadFolder || downloadFolder
-        const filePath = path.join(folder, options.path.toString(), filename)
+        const filePath = path.join(folder, options.path.toString(), filename.split(/[?#]/)[0])
 
         if (fs.existsSync(filePath)) {
             const stats = fs.statSync(filePath);
