@@ -137,6 +137,12 @@ const download = (options, callback) => {
 
     const request = net.request(options.url);
     
+    const filename = decodeURIComponent(path.basename(options.url));
+    const url = decodeURIComponent(options.url);
+
+    const folder = options.downloadFolder || downloadFolder
+    const filePath = path.join(folder, options.path.toString(), filename.split(/[?#]/)[0])
+
     if (options.headers) {
         options.headers.forEach((h) => { request.setHeader(h.name, h.value) })
 
@@ -156,11 +162,16 @@ const download = (options, callback) => {
         request.on('login', options.onLogin)
     }
 
+    request.on('error', function (error) {
+        let finishedDownloadCallback = callback || function () { };
+
+        const message = `The request for ${filename} was interrupted: ${error}`;
+
+        finishedDownloadCallback(new Error(message), { url: options.url, filePath: filePath });
+    });
+
     request.on('response', function (response) {
         request.abort();
-
-        const filename = decodeURIComponent(path.basename(options.url));
-        const url = decodeURIComponent(options.url);
 
         queue.push({
             url: url,
@@ -171,8 +182,6 @@ const download = (options, callback) => {
             onProgress: options.onProgress
         });
 
-        const folder = options.downloadFolder || downloadFolder
-        const filePath = path.join(folder, options.path.toString(), filename.split(/[?#]/)[0])
 
         if (fs.existsSync(filePath)) {
             const stats = fs.statSync(filePath);
