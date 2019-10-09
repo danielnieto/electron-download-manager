@@ -195,6 +195,18 @@ Emitted when an authenticating proxy is asking for user credentials.
 
 > Please see [Class ClientRequest's 'login' event](http://electronjs.org/docs/api/client-request#event-login) for detail.
 
+#### username
+Type: `string`<br>
+Default: `""`
+
+Except using onLogin callback, you can use username and password attributes to let DownloadManager do user credentials automatically.
+
+#### password
+Type: `string`<br>
+Default: `""`
+
+See previous please.
+
 #### onProgress(progress, item)
 Type: `function`<br>
 
@@ -228,6 +240,20 @@ if the download was successful the callback's error will be `null`, otherwise it
 
 `url` returns the url of the downloaded file<br>
 `filePath` location of where the file was saved
+
+
+### DownloadManager.cancelDownload(url)
+
+Cancel the downloaing task according to the url.
+
+### url
+
+Type: `string`<br>
+
+The resource url passed to download() function previously.
+
+Return true if the specific url download item is found and cancelled ok. Otherwise, return false.
+
 
 ### DownloadManager.bulkDownload(options, callback(error, finished, failed))
 
