@@ -9,6 +9,7 @@ let downloadFolder = app.getPath('downloads');
 let lastWindowCreated;
 
 const queue = [];
+const downloadingItems = {};
 
 const _popQueueItem = (url) => {
     let queueItem = queue.find(item => item.url === url);
@@ -59,6 +60,9 @@ function _registerListener(win, opts = {}) {
 
             item.setSavePath(filePath);
 
+            // keep tracking to download task
+            downloadingItems[itemUrl] = {queueItem, downloadItem: item};
+
             // Resuming an interrupted download
             if (item.getState() === 'interrupted') {
                 item.resume();
@@ -91,6 +95,8 @@ function _registerListener(win, opts = {}) {
             });
 
             item.on('done', (e, state) => {
+                // release tracking
+                delete downloadingItems[itemUrl];
 
                 let finishedDownloadCallback = queueItem.callback || function () {};
 
@@ -160,6 +166,10 @@ const download = (options, callback) => {
 
     if (typeof options.onLogin === 'function') {
         request.on('login', options.onLogin)
+    } else if (options.username && options.password) {
+        request.on('login', (authInfo, callback) => {
+            callback(options.username, options.password)
+        })
     }
 
     request.on('error', function (error) {
@@ -223,6 +233,24 @@ const download = (options, callback) => {
     request.end();
 };
 
+const cancelDownload = (url) => {
+    // remove from queue first
+    const queueItem = _popQueueItem(url);
+    if (queueItem) {
+        return true;
+    }
+
+    // remove from downloading tasks
+    const item = downloadingItems[url];
+    if (item) {
+        item.downloadItem.cancel();
+        delete downloadingItems[url];
+        return true;
+    }
+
+    return false;
+}
+
 const bulkDownload = (options, callback) => {
 
     options = Object.assign({}, { urls: [], path: '' }, options);
@@ -261,5 +289,6 @@ const bulkDownload = (options, callback) => {
 module.exports = {
     register,
     download,
+    cancelDownload,
     bulkDownload
 };

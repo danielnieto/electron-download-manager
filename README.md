@@ -229,6 +229,20 @@ if the download was successful the callback's error will be `null`, otherwise it
 `url` returns the url of the downloaded file<br>
 `filePath` location of where the file was saved
 
+
+### DownloadManager.cancelDownload(url)
+
+Cancel the downloaing task according to the url.
+
+### url
+
+Type: `string`<br>
+
+The resource url passed to download() function previously.
+
+Return true if the specific url download item is found and cancelled ok. Otherwise, return false.
+
+
 ### DownloadManager.bulkDownload(options, callback(error, finished, failed))
 
 ### options
