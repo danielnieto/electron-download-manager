@@ -195,6 +195,18 @@ Emitted when an authenticating proxy is asking for user credentials.
 
 > Please see [Class ClientRequest's 'login' event](http://electronjs.org/docs/api/client-request#event-login) for detail.
 
+#### username
+Type: `string`<br>
+Default: `""`
+
+Except using onLogin callback, you can use username and password attributes to let DownloadManager do user credentials automatically.
+
+#### password
+Type: `string`<br>
+Default: `""`
+
+See previous please.
+
 #### onProgress(progress, item)
 Type: `function`<br>
 
