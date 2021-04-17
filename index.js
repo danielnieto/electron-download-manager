@@ -6,6 +6,7 @@ const fs = require('fs');
 
 const app = electron.app;
 let downloadFolder = app.getPath('downloads');
+let moduleOptions = {};
 let lastWindowCreated;
 
 const queue = [];
@@ -120,15 +121,16 @@ function _registerListener(win, opts = {}) {
             });
         }
     };
-
+    win.webContents.session.off('will-download', listener);
     win.webContents.session.on('will-download', listener);
 }
-
+const windowListener = function (e, win) {
+    _registerListener(win, moduleOptions);
+}
 const register = (opts = {}) => {
-
-    app.on('browser-window-created', (e, win) => {
-        _registerListener(win, opts);
-    });
+    moduleOptions = opts;    
+    app.off('browser-window-created', windowListener);
+    app.on('browser-window-created', windowListener);
 };
 
 const download = (options, callback) => {
