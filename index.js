@@ -137,7 +137,10 @@ const download = (options, callback) => {
 
     const request = net.request(options.url);
     
-    const filename = decodeURIComponent(path.basename(options.url));
+    var filename = decodeURIComponent(path.basename(options.url));
+    if (options.filename) {
+        filename = options.filename;
+    }
     const url = decodeURIComponent(options.url);
 
     const folder = options.downloadFolder || downloadFolder
