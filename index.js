@@ -51,13 +51,14 @@ function _registerListener(win, opts = {}) {
         if (queueItem) {
             const folder = queueItem.downloadFolder || downloadFolder
             const filePath = path.join(folder, queueItem.path, itemFilename);
+            const filePathTmp = path.join(folder, queueItem.path, "tmp-" + itemFilename);
 
             const totalBytes = item.getTotalBytes();
             let speedValue = 0;
             let receivedBytes;
             let PreviousReceivedBytes;
 
-            item.setSavePath(filePath);
+            item.setSavePath(filePathTmp);
 
             // Resuming an interrupted download
             if (item.getState() === 'interrupted') {
@@ -112,6 +113,11 @@ function _registerListener(win, opts = {}) {
                     // if (opts.unregisterWhenDone) {
                     //     webContents.session.removeListener('will-download', listener);
                     // }
+
+                    // move file from temporary name to desired name
+                    try {
+                        fs.renameSync(filePathTmp, filePath);
+                    } catch {}
 
                     finishedDownloadCallback(null, { url: item.getURL(), filePath });
 
