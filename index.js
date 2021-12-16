@@ -43,21 +43,22 @@ function _registerListener(win, opts = {}) {
     const listener = (e, item) => {
 
         const itemUrl = decodeURIComponent(item.getURLChain()[0] || item.getURL())
-        const itemFilename = decodeURIComponent(item.getFilename());
-
         let queueItem = _popQueueItem(itemUrl);
+        const itemFilename = queueItem.filename;
+
         let ReceivedBytesArr = [];
 
         if (queueItem) {
             const folder = queueItem.downloadFolder || downloadFolder
             const filePath = path.join(folder, queueItem.path, itemFilename);
+            const filePathTmp = path.join(folder, queueItem.path, "tmp-" + itemFilename);
 
             const totalBytes = item.getTotalBytes();
             let speedValue = 0;
             let receivedBytes;
             let PreviousReceivedBytes;
 
-            item.setSavePath(filePath);
+            item.setSavePath(filePathTmp);
 
             // Resuming an interrupted download
             if (item.getState() === 'interrupted') {
@@ -113,6 +114,11 @@ function _registerListener(win, opts = {}) {
                     //     webContents.session.removeListener('will-download', listener);
                     // }
 
+                    // move file from temporary name to desired name
+                    try {
+                        fs.renameSync(filePathTmp, filePath);
+                    } catch {}
+
                     finishedDownloadCallback(null, { url: item.getURL(), filePath });
 
                 }
@@ -137,7 +143,10 @@ const download = (options, callback) => {
 
     const request = net.request(options.url);
     
-    const filename = decodeURIComponent(path.basename(options.url));
+    var filename = decodeURIComponent(path.basename(options.url));
+    if (options.filename) {
+        filename = options.filename;
+    }
     const url = decodeURIComponent(options.url);
 
     const folder = options.downloadFolder || downloadFolder
